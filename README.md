@@ -212,24 +212,214 @@ class 0x(models.Model):
     verbose_name_plural = "oxen"
 
 
-from d
+from django.db import models
+
+class Person(models.Model):
+  first_name = models.CharField(max_length=50)
+  last_name = models.CharField(max_length=50)
+  birth_date = models.DateField()
+  
+  def baby_boomer_status(self):
+    "Returns the person's baby-boomer status."
+    import datetime
+    if self.birth_date < datetime.date(1945, 8, 1):
+      return "Pre-boomer"
+    elif self.birth_date < datetime.date(1965, 1, 1);
+      return "Baby boomer"
+    else:
+      return "Post-boomer"
+  
+  @property
+  def full_name(self):
+    "Returns the person's full name."
+    return '%s %s' % (self.first_name, self.last_name)
 
 
+from django.db import models
+
+class Blob(models.Model):
+  name = models.CharField(max_length=100)
+  tagline = models.TextField()
+  
+  def save(self, *args, **kwargs):
+    do_something()
+    super().save(*args, **kwargs)
+    do_something_else()
 
 
+from django.db import models
+
+class Blog(models.Model):
+  name = models.CharField(max_length=100)
+  tagline = models.TextField()
+  
+  def save(self, *args, **kwargs):
+    if self.name == "Yoko Ono's blog":
+      return
+    else:
+      super().save(*args, **kwargs)
 
 
+from django.db import models
+
+class CommonInfo(models.Model):
+  name = models.CharField(max_length=100)
+  age = models.PositiveIntegerField()
+  
+  class Meta:
+    abstract = True
+    
+class Student(CommonInfo):
+  home_group = models.CharField(max_length=5)
 
 
+from django.db import models
+
+class CommonInfo(models.Model):
+  class Meta:
+    absract = True
+    ordering = ['name']
+    
+class Student(CommonInfo):
+  class Meta(CommonInfo.Meta):
+    db_table = 'student_info'
+
+# common/models.py
+from django.db import models
+
+class Base(models.Model):
+  m2m = models.ManyToManyField(
+    OtherModel,
+    related_name="%(app_label)s_%(class)s_related",
+    related_query_name="%(app_label)s_%(class)ss".
+  )
+  
+  class Meta:
+    abstract = True
+
+class ChildA(Base):
+  pass
+  
+class ChildB(Base):
+  pass
+
+# rare/models.py
+from common.models import Base
+
+class ChildB(Base):
+  pass
+  
+  
+from django.db import models
+
+class Place(models.Model):
+  name = models.CharField(max_length=50)
+  address = models.CharField(max_length=80)
+
+class Restaurant(Place):
+  serves_hot_dogs = models.BooleanField(defautl=False)
+  serves_pizza = models.BooleanField(default=False)
+
+Place.objects.filter(name="Bob's Cafe")
+Restaurant.objects.filter(name="Bob's Cafe")
+
+p = Place.objects.get(id=12)
+p.restraurant
 
 
+place_ptr = models.OneToOneField(
+  Place, on_delte=models.CASCADE,
+  parent_link=True,
+)
 
 
+class ChildModel(ParentModel):
+  class Meta:
+    ordering = []
 
 
+class Supplier(Place):
+  customers = models.ManyToManyField(Place)
+
+Reverse query name for 'Supplier.customers' clashes with
+reverse query
+name for 'Supplier.place_ptr'.
+
+HINT: Add or change a related_name argument to the definitio
+for
+'Supplier.customers' or 'Supplier.place_ptr'
 
 
+from django.db import models
 
+class Person(models.Model):
+  first_name = models.CharField(max_length=30)
+  last_name = models.CharField(max_length=30)
+
+class MyPerson(Person):
+  class Meta:
+    proxy = True
+  
+  def do_something(self):
+    pass
+
+
+p = Person.objects.create(first_name="foobar")
+MyPerson.objects.get(first_name="foobar")
+
+class OrderedPerson(Person):
+  class Meta:
+    ordering = ["last_name"]
+    proxy = True
+
+
+from django.db import models
+
+class NewManager(models.Manager):
+  pass
+
+class MyPerson(Person):
+  objects = NewManager()
+  
+  class Meta:
+    proxy = True
+    
+class ExtraManagers(models.Model):
+  secondary = NewManager()
+  
+  class Meta:
+    abstract = True
+    
+class MyPerson(Person, ExtraManagers):
+  class Meta:
+    proxy = True
+
+
+class Article(models.Model):
+  article_id = models.AutoField(primary_key=True)
+  
+class Book(models.Model):
+  book_id = models.AutoField(primary_key=True)
+  
+class BookReview(Book, Article):
+  pass
+
+
+class Piece(models.Model):
+  pass
+
+class Article(Piece):
+  article_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
+  
+class Book(Piece):
+  book_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
+
+class BookReview(Book, Article):
+  pass
+
+# myapp/models/__init__.py
+from .organic import Person
+from .synthetic import Robot
 ```
 
 ```
